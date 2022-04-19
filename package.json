@@ -8,7 +8,7 @@
     "start": "node server.js"
   },
   "repository": {
-    "type": "git",
+    "type": "module",
     "url": "git+https://github.com/comp426-2022-spring/a04-karengu0.git"
   },
   "author": "",
