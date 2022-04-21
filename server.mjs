@@ -161,10 +161,30 @@ if (args.help || args.h) {
     process.exit(0)
 }
 
+//log
 if (args.log == true) {
     const accessLog = fs.createWriteStream('access.log', {flags: 'a'})
     app.use(morgan('combined', {stream:accessLog}))
 }
+
+//middleware
+app.use((req, res, next) => {
+    let logdata = {
+        remoteaddr: req.ip,
+        remoteuser: req.user,
+        time: Date.now(),
+        method: req.method,
+        url: req.url,
+        protocol: req.protocol,
+        httpversion: req.httpVersion,
+        status: res.statusCode,
+        referer: req.headers["referer"],
+        useragent: req.headers["user-agent"]
+    }
+    const stmt = db.prepare('INSERT INTO accesslog (remoteaddr, remoteuser, time, method, url, protocol, httpversion, status, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    const info = stmt.run(logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.status, logdata.referer, logdata.useragent)
+    next();
+})
 
 // Check status code endpoint
 app.get('/app/', (req, res) => {
@@ -179,39 +199,50 @@ app.get('/app/', (req, res) => {
 // Endpoint returning JSON of flip function result
 app.get('/app/flip/', (req, res) => {
     res.statusCode = 200;
-    let aFlip = coinFlip()
-    res.json({flip: aFlip})
-    res.writeHead(res.statusCode, {'Content-Type' : 'application/json'});
+    res.json({'flip': coinFlip()})
 })
 
 // Endpoint returning JSON of flip array & summary
 app.get('/app/flips/:number', (req, res) => {
+    const flips = coinFlips(req.params.number)
+    const count = countFlips(flips)
     res.statusCode = 200;
-    var number = req.params.number;
-    let flips = coinFlips(number);
-    let summary = countFlips(flips);
-    res.json({raw: flips, summary: summary}) //json: way to transfer data
-                                                // like a dictionary, key-->string
-    res.writeHead(res.statusCode, {'Content-Type': 'application/json'});
+    res.json({'raw':flips,'summary':count})
 })
 
 // Endpoint that returns result of calling heads
 app.get('/app/flip/call/heads', (req, res) => {
+    const flipH = flipACoin(req.params.heads)
     res.statusCode = 200;
-    let answer = flipACoin('heads')
-    res.send(answer) //converts to plain text without using json
-    res.writeHead(res.statusCode, {'Content-Type': 'text/plain'});
+    res.json(flipH)
 })
 
 //Endpoint that returns the result of calling tails
 app.get('/app/flip/call/tails', (req, res) => {
+    const flipT = flipACoin(req.params.tails)
     res.statusCode = 200;
-    let answer = flipACoin('tails')
-    res.send(answer)
-    res.writeHead(res.statusCode, {'Content-Type': 'text/plain'});
+    res.json(flipT)
 })
+
+// Default endpoints
+if (args.debug) {
+    app.get('/app/log/access', (req, res) => {
+        const stmt = db.prepare("SELECT * FROM accesslog".all());
+        res.statusCode = 200;
+        res.json = stmt;
+    })
+    app.get('/app/error', (req, res) => {
+        throw new Error("Error Test Successful.");
+    })
+}
 
 // Default response for any other request
 app.use(function(req, res){
     res.status(404).send('404 NOT FOUND')
 });
+
+process.on('SIGTERM', () => {
+    server.close(() => {
+        console.log('Server stopped')
+    })
+})
