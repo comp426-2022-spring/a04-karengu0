@@ -1,6 +1,8 @@
+const db = require('./database.js')
+const morgan = require('morgan')
+const fs = require('fs')
+
 /** Coin flip functions 
- * This module will emulate a coin flip given various conditions as parameters as defined below
- */
 
 /** Simple coin flip
  * 
@@ -13,11 +15,6 @@
  * returns: heads
  * 
  */
-// function getRandomIntInclusive(min, max) {
-//   min = Math.ceil(min);
-//   max = Math.floor(max);
-//   return Math.floor(Math.random() * (max - min + 1) + min);
-// }
 function coinFlip() {
     return (Math.floor(Math.random() * 2) == 0) ? 'heads' : 'tails';
   }
@@ -124,6 +121,23 @@ const args = require('minimist')(process.argv.slice(2))
 const express = require('express')
 // See what is stored in the object produced by minimist
 console.log(args)
+const port = args.port || process.env.PORT || 5555
+
+// Require Express.js
+//const express = require('express')
+const app = express()
+app.use(express.urlencoded({ extended: true}))
+app.use(express.json())
+
+var argument = minimist(process.argv.slice(2))
+var name = 'port'
+const HTTP_PORT = argument[name] || 5000
+
+// Start an app server
+const server = app.listen(HTTP_PORT, () => {
+    console.log('App listening on port %PORT%'.replace('%PORT%',HTTP_PORT))
+});
+
 // Store help text 
 const help = (`
 server.js [options]
@@ -147,18 +161,10 @@ if (args.help || args.h) {
     process.exit(0)
 }
 
-// Require Express.js
-//const express = require('express')
-const app = express()
-
-var argument = minimist(process.argv.slice(2))
-var name = 'port'
-const HTTP_PORT = argument[name] || 5000
-
-// Start an app server
-const server = app.listen(HTTP_PORT, () => {
-    console.log('App listening on port %PORT%'.replace('%PORT%',HTTP_PORT))
-});
+if (args.log == true) {
+    const accessLog = fs.createWriteStream('access.log', {flags: 'a'})
+    app.use(morgan('combined', {stream:accessLog}))
+}
 
 // Check status code endpoint
 app.get('/app/', (req, res) => {
