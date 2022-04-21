@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/comp426-2022-spring/a04-karengu0/issues"
   },
-  "homepage": "https://github.com/comp426-2022-spring/a04-karengu0#readme"
+  "homepage": "https://github.com/comp426-2022-spring/a04-karengu0#readme",
+  "dependencies": {
+    "better-sqlite3": "^7.5.1"
+  }
 }
