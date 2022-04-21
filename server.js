@@ -99,21 +99,6 @@ function coinFlip() {
     }
     return {"call": call, "flip": flip, "result": result};
   }
-  
-  
-  /** Export 
-   * 
-   * Export all of your named functions
-  */
-  
-  // export {coinFlip, coinFlips, countFlips, flipACoin};
-  
-
-import minimist from 'minimist'; // parses argument options
-import express from 'express'; // minimal & flexible Node.js web application framework
-                                // provides features for web & mobile applications
-                                // Node.js: asynchronous event-driven JS runtime environemtn
-                                // for scalable network applications
 
 // Require minimist module
 const args = require('minimist')(process.argv.slice(2))
