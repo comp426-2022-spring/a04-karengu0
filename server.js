@@ -1,6 +1,9 @@
 const db = require('./database.js')
 const morgan = require('morgan')
 const fs = require('fs')
+const args = require('minimist')(process.argv.slice(2))
+const express = require('express')
+const app = express()
 
 /** Coin flip functions 
 
@@ -100,50 +103,25 @@ function coinFlip() {
     return {"call": call, "flip": flip, "result": result};
   }
 
-// Require minimist module
-const args = require('minimist')(process.argv.slice(2))
-// Require Express.js
-const express = require('express')
-// See what is stored in the object produced by minimist
-console.log(args)
+app.use(express.urlencoded({ extended: true}));
+app.use(express.json());
+
+args['port','debug','log','help']
 const port = args.port || process.env.PORT || 5555
 
-// Require Express.js
-//const express = require('express')
-const app = express()
-app.use(express.urlencoded({ extended: true}))
-app.use(express.json())
-
-var argument = minimist(process.argv.slice(2))
-var name = 'port'
-const HTTP_PORT = argument[name] || 5000
-
 // Start an app server
-const server = app.listen(HTTP_PORT, () => {
-    console.log('App listening on port %PORT%'.replace('%PORT%',HTTP_PORT))
+const server = app.listen(port, () => {
+    console.log('App listening on port %PORT%'.replace('%PORT%',port))
 });
 
 // Store help text 
-const help = (`
-server.js [options]
-
---port	Set the port number for the server to listen on. Must be an integer
-            between 1 and 65535.
-
---debug	If set to true, creates endlpoints /app/log/access/ which returns
-            a JSON access log from the database and /app/error which throws 
-            an error with the message "Error test successful." Defaults to 
-            false.
-
---log		If set to false, no log files are written. Defaults to true.
-            Logs are always written to database.
-
---help	Return this message and exit.
-`)
-// If --help or -h, echo help text to STDOUT and exit
-if (args.help || args.h) {
-    console.log(help)
-    process.exit(0)
+if (args.help == true) {
+  // console.log('server.js [options]')
+  console.log('--port     Set the port number for the server to listen on. Must be an integer between 1 and 65535.\n')
+  console.log('--debug    If set to `true`, creates endlpoints /app/log/access/ which returns a JSON access log from the database and /app/error which throws an error with the message "Error test successful." Defaults to `false`.\n')
+  console.log('--log      If set to false, no log files are written. Defaults to true. Logs are always written to database.\n')
+  console.log('--help     Return this message and exit.')
+  process.exit(0)
 }
 
 //log
