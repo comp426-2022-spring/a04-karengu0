@@ -109,11 +109,6 @@ app.use(express.json());
 args['port','debug','log','help']
 const port = args.port || process.env.PORT || 5555
 
-// Start an app server
-const server = app.listen(port, () => {
-    console.log('App listening on port %PORT%'.replace('%PORT%',port))
-});
-
 // Store help text 
 if (args.help == true) {
   // console.log('server.js [options]')
@@ -130,6 +125,11 @@ if (args.log == true) {
     app.use(morgan('combined', {stream:accessLog}))
 }
 
+// Start an app server
+const server = app.listen(port, () => {
+    console.log('App listening on port %PORT%'.replace('%PORT%',port))
+});
+
 //middleware
 app.use((req, res, next) => {
     let logdata = {
@@ -140,12 +140,13 @@ app.use((req, res, next) => {
         url: req.url,
         protocol: req.protocol,
         httpversion: req.httpVersion,
+        secure: req.secure,
         status: res.statusCode,
         referer: req.headers["referer"],
         useragent: req.headers["user-agent"]
     }
-    const stmt = db.prepare('INSERT INTO accesslog (remoteaddr, remoteuser, time, method, url, protocol, httpversion, status, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-    const info = stmt.run(logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.status, logdata.referer, logdata.useragent)
+    const stmt = db.prepare('INSERT INTO accesslog (remoteaddr, remoteuser, time, method, url,  protocol, httpversion, secure, status, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    const info = stmt.run(logdata.remoteaddr.toString(), logdata.remoteuser, logdata.time, logdata.method.toString(), logdata.url.toString(), logdata.protocol.toString(), logdata.httpversion.toString(), logdata.secure.toString(), logdata.status.toString(), logdata.referer, logdata.useragent.toString())
     next();
 })
 
@@ -191,11 +192,10 @@ app.get('/app/flip/call/tails', (req, res) => {
 if (args.debug) {
     app.get('/app/log/access', (req, res) => {
         const stmt = db.prepare("SELECT * FROM accesslog".all());
-        res.statusCode = 200;
-        res.json = stmt;
+        res.statusCode(200).json(stmt);
     })
     app.get('/app/error', (req, res) => {
-        throw new Error("Error Test Successful.");
+        throw new Error("Error test successful.");
     })
 }
 
