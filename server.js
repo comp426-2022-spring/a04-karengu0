@@ -115,7 +115,7 @@ if (args.help == true) {
   console.log('--port     Set the port number for the server to listen on. Must be an integer between 1 and 65535.\n')
   console.log('--debug    If set to true, creates endlpoints /app/log/access/ which returns a JSON access log from the database and /app/error which throws an error with the message "Error test successful." Defaults to false.\n')
   console.log('--log      If set to false, no log files are written. Defaults to true. Logs are always written to database.\n')
-  console.log('--help     Return this message and exit.\n')
+  console.log('--help     Return this message and exit.')
   process.exit(0)
 }
 
