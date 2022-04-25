@@ -189,16 +189,16 @@ app.get('/app/flip/call/tails', (req, res) => {
 })
 
 // Default endpoints
-// if (args.debug) {
-//     app.get('/app/log/access', (req, res) => {
-//       try {
-//         const stmt = db.prepare('SELECT * FROM accesslog').all()
-//         res.status(200).json(stmt)
-//         } catch(e) {
-//           console.error(e)
-//         }
-//     })
-// }
+if (args.debug) {
+    app.get('/app/log/access', (req, res) => {
+      try {
+        const stmt = db.prepare('SELECT * FROM accesslog').all()
+        res.status(200).json(stmt)
+        } catch(e) {
+          console.error(e)
+        }
+    })
+}
 
 // Default response for any other request
 app.use(function(req, res){
