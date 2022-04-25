@@ -198,12 +198,12 @@ if (args.debug) {
           console.error(e)
         }
     })
+    // Default response for any other request
+    app.get('/app/error', (req, res) => {
+      res.status(500).json(stmt);
+      throw new Error('Error test successful.');
+  })
 }
-
-// Default response for any other request
-app.use(function(req, res){
-    res.status(404).send('404 NOT FOUND')
-});
 
 process.on('SIGTERM', () => {
     server.close(() => {
