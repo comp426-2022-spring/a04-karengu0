@@ -15,17 +15,24 @@ let row = stmt.get();
 // Check if there is a table. If row is undefined then no table exists.
 if (row === undefined) {
 // Echo information about what you are doing to the console.
-    console.log('Log database is empty. Creating log database...');
+    console.log('Your database appears to be empty. I will initialize it now.');
 // Set a const that will contain your SQL commands to initialize the database.
     const sqlInit = `
-        TABLE accesslog ( id INTEGER NOT NULL PRIMARY KEY, 
-            remoteaddr TEXT, remoteuser TEXT, time INTEGER, 
-            method TEXT, url TEXT, protocol TEXT, 
-            httpversion TEXT, status INTEGER, 
-            referer TEXT, useragent TEXT);
-    `;
+    CREATE TABLE accesslog ( id INTEGER PRIMARY KEY, 
+        remoteaddr TEXT, 
+        remoteuser TEXT, 
+        time TEXT, 
+        method TEXT, 
+        url TEXT,  
+        protocol TEXT,
+        httpversion TEXT,
+        secure TEXT, 
+        status TEXT, 
+        referer TEXT, 
+        useragent TEXT);`;
 // Execute SQL commands that we just wrote above.
     db.exec(sqlInit);
+    console.log('Database is now initialized.')
 } else {
 // Since the database already exists, echo that to the console.
     console.log('Database exists.')
