@@ -120,10 +120,10 @@ if (args.help == true) {
 }
 
 //log
-if (args.log == true) {
-    const accessLog = fs.createWriteStream('access.log', {flags: 'a'})
-    app.use(morgan('combined', {stream:accessLog}))
-}
+// if (args.log == true) {
+//     const accessLog = fs.createWriteStream('access.log', {flags: 'a'})
+//     app.use(morgan('combined', {stream:accessLog}))
+// }
 
 // Start an app server
 const server = app.listen(port, () => {
@@ -189,16 +189,16 @@ app.get('/app/flip/call/tails', (req, res) => {
 })
 
 // Default endpoints
-if (args.debug) {
-    app.get('/app/log/access', (req, res) => {
-      try {
-        const stmt = db.prepare('SELECT * FROM accesslog').all()
-        res.status(200).json(stmt)
-        } catch(e) {
-          console.error(e)
-        }
-    })
-}
+// if (args.debug) {
+//     app.get('/app/log/access', (req, res) => {
+//       try {
+//         const stmt = db.prepare('SELECT * FROM accesslog').all()
+//         res.status(200).json(stmt)
+//         } catch(e) {
+//           console.error(e)
+//         }
+//     })
+// }
 
 // Default response for any other request
 app.use(function(req, res){
